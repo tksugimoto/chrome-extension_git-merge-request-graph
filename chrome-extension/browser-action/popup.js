@@ -27,7 +27,7 @@ document.querySelector('#generate').addEventListener('click', () => {
 	.then(transformToBranchMap)
 	.then(branchMap => {
 		const mermaidTextArray = [];
-		mermaidTextArray.push('graph TB');
+		mermaidTextArray.push('graph BT');
 		mermaidTextArray.push(`${env.baseBranchName}`);
 
 		const disp = targetBranch => {
@@ -35,7 +35,7 @@ document.querySelector('#generate').addEventListener('click', () => {
 			branchMap[targetBranch].forEach(mergeRequest => {
 				const sourceBranch = mergeRequest.source_branch;
 				mermaidTextArray.push(`${sourceBranch}("!${mergeRequest.iid}: ${mergeRequest.title.replace(/"/g, '#quot;')}")`);
-				mermaidTextArray.push(`${targetBranch} --> ${sourceBranch}`);
+				mermaidTextArray.push(`${sourceBranch} --> ${targetBranch}`);
 				disp(sourceBranch);
 			});
 		};
