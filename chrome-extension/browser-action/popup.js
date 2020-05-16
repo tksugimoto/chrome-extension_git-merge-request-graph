@@ -4,6 +4,7 @@ import MermaidViewer from '../web-components/mermaid-viewer.js';
 const fetchMergeRequests = () => {
 	const url = new URL(`${env.baseUrl}/api/v4/projects/${env.projectId}/merge_requests`);
 	url.searchParams.set('private_token', env.accessToken);
+	url.searchParams.set('per_page', 100);
 	return fetch(url.toString()).then(res => res.json());
 };
 
