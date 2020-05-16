@@ -50,6 +50,7 @@ document.querySelector('#generate').addEventListener('click', () => {
 				if (mergeRequest.state !== 'opened') return;
 				const sourceBranch = mergeRequest.source_branch;
 				mermaidTextArray.push(`${escapeMermaidMeta(sourceBranch)}("!${mergeRequest.iid}: ${mergeRequest.title.replace(/"/g, '#quot;')}")`);
+				mermaidTextArray.push(`click ${escapeMermaidMeta(sourceBranch)} "${mergeRequest.web_url}"`);
 				mermaidTextArray.push(`${escapeMermaidMeta(sourceBranch)} --> ${escapeMermaidMeta(targetBranch)}`);
 				disp(sourceBranch);
 			});
