@@ -9,7 +9,7 @@ const fetchMergeRequests = () => {
 	const url = new URL(`${env.baseUrl}/api/v4/projects/${env.projectId}/merge_requests`);
 	url.searchParams.set('private_token', env.accessToken);
 	url.searchParams.set('per_page', 100);
-	url.searchParams.set('state', 'opened');
+	url.searchParams.set('state', 'all');
 	url.searchParams.set('order_by', 'updated_at');
 	return fetch(url.toString()).then(res => res.json());
 };
@@ -26,6 +26,13 @@ const transformToBranchMap = mergeRequests => {
 		if (!branchMap[target]) branchMap[target] = [];
 		branchMap[target].push(mergeRequest);
 	});
+	mergeRequests
+	.filter(mergeRequest => mergeRequest.state === 'merged')
+	.forEach(mergeRequest => {
+		const target = mergeRequest.target_branch;
+		// TODO: merge済みMRが多段になっているときに対応
+		branchMap[target] = branchMap[target].concat(branchMap[mergeRequest.source_branch] || []);
+	});
 	return branchMap;
 };
 
@@ -40,6 +47,7 @@ document.querySelector('#generate').addEventListener('click', () => {
 		const disp = targetBranch => {
 			if (!branchMap[targetBranch]) return;
 			branchMap[targetBranch].forEach(mergeRequest => {
+				if (mergeRequest.state !== 'opened') return;
 				const sourceBranch = mergeRequest.source_branch;
 				mermaidTextArray.push(`${escapeMermaidMeta(sourceBranch)}("!${mergeRequest.iid}: ${mergeRequest.title.replace(/"/g, '#quot;')}")`);
 				mermaidTextArray.push(`${escapeMermaidMeta(sourceBranch)} --> ${escapeMermaidMeta(targetBranch)}`);
