@@ -59,7 +59,9 @@ document.querySelector('#generate').addEventListener('click', () => {
 
 		return mermaidTextArray.join('\n');
 	}).then(mermaidText => {
+		const container = document.querySelector('#result');
+		container.textContent = '';
 		const mermaidViewer = new MermaidViewer(mermaidText);
-		document.querySelector('#result').append(mermaidViewer);
+		container.append(mermaidViewer);
 	});
 });
