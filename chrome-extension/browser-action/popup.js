@@ -1,6 +1,10 @@
 import env from '../.env.js';
 import MermaidViewer from '../web-components/mermaid-viewer.js';
 
+const escapeMermaidMeta = text => {
+	return text.replace(/class/g, 'CLASS');
+};
+
 const fetchMergeRequests = () => {
 	const url = new URL(`${env.baseUrl}/api/v4/projects/${env.projectId}/merge_requests`);
 	url.searchParams.set('private_token', env.accessToken);
@@ -37,8 +41,8 @@ document.querySelector('#generate').addEventListener('click', () => {
 			if (!branchMap[targetBranch]) return;
 			branchMap[targetBranch].forEach(mergeRequest => {
 				const sourceBranch = mergeRequest.source_branch;
-				mermaidTextArray.push(`${sourceBranch}("!${mergeRequest.iid}: ${mergeRequest.title.replace(/"/g, '#quot;')}")`);
-				mermaidTextArray.push(`${sourceBranch} --> ${targetBranch}`);
+				mermaidTextArray.push(`${escapeMermaidMeta(sourceBranch)}("!${mergeRequest.iid}: ${mergeRequest.title.replace(/"/g, '#quot;')}")`);
+				mermaidTextArray.push(`${escapeMermaidMeta(sourceBranch)} --> ${escapeMermaidMeta(targetBranch)}`);
 				disp(sourceBranch);
 			});
 		};
