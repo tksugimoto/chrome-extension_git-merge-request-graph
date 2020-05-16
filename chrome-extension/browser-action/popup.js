@@ -30,7 +30,7 @@ document.querySelector('#generate').addEventListener('click', () => {
 	.then(transformToBranchMap)
 	.then(branchMap => {
 		const mermaidTextArray = [];
-		mermaidTextArray.push('graph BT');
+		mermaidTextArray.push('graph RL');
 		mermaidTextArray.push(`${env.baseBranchName}`);
 
 		const disp = targetBranch => {
