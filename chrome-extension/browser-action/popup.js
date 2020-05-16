@@ -5,6 +5,8 @@ const fetchMergeRequests = () => {
 	const url = new URL(`${env.baseUrl}/api/v4/projects/${env.projectId}/merge_requests`);
 	url.searchParams.set('private_token', env.accessToken);
 	url.searchParams.set('per_page', 100);
+	url.searchParams.set('state', 'opened');
+	url.searchParams.set('order_by', 'updated_at');
 	return fetch(url.toString()).then(res => res.json());
 };
 
