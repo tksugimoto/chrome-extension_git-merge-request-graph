@@ -59,6 +59,7 @@ document.querySelector('#generate').addEventListener('click', () => {
 
 		return mermaidTextArray.join('\n');
 	}).then(mermaidText => {
+		saveResult(mermaidText);
 		showGraph(mermaidText);
 	});
 });
@@ -69,3 +70,21 @@ const showGraph = mermaidText => {
 	const mermaidViewer = new MermaidViewer(mermaidText);
 	container.append(mermaidViewer);
 };
+
+const storageKey = 'previous-result';
+const saveResult = mermaidText => {
+	chrome.storage.local.set({
+		[storageKey]: mermaidText,
+	});
+};
+const loadResult = () => {
+	return new Promise(resolve => {
+		chrome.storage.local.get(storageKey, items => {
+			resolve(items[storageKey]);
+		});
+	});
+};
+
+loadResult().then(mermaidText => {
+	if (mermaidText) showGraph(mermaidText);
+});
