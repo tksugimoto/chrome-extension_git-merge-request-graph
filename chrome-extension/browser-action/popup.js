@@ -1,4 +1,5 @@
 import env from '../.env.js';
+import Storage from '../Storage.js';
 import MermaidViewer from '../web-components/mermaid-viewer.js';
 
 const escapeMermaidMeta = text => {
@@ -67,7 +68,7 @@ document.querySelector('#update').addEventListener('click', () => {
 	fetchMergeRequests()
 	.then(transformToBranchMap)
 	.then(branchMap => {
-		saveBranchMap(branchMap);
+		branchMapStorage.save(branchMap);
 		updateBranchList(branchMap);
 		return transformToMermaidText(env.baseBranchName, branchMap);
 	})
@@ -107,21 +108,9 @@ const showGraph = mermaidText => {
 	container.append(mermaidViewer);
 };
 
-const storageKey = 'previous-branch-map';
-const saveBranchMap = mermaidText => {
-	chrome.storage.local.set({
-		[storageKey]: mermaidText,
-	});
-};
-const loadBranchMap = () => {
-	return new Promise(resolve => {
-		chrome.storage.local.get(storageKey, items => {
-			resolve(items[storageKey]);
-		});
-	});
-};
+const branchMapStorage = new Storage('previous-branch-map');
 
-loadBranchMap().then(branchMap => {
+branchMapStorage.load().then(branchMap => {
 	if (branchMap) {
 		updateBranchList(branchMap);
 		const mermaidText = transformToMermaidText(env.baseBranchName, branchMap);
