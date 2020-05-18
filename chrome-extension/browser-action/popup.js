@@ -64,7 +64,7 @@ const transformToMermaidText = (baseBranchName, branchMap) => {
 	return mermaidTextArray.join('\n');
 };
 
-const updateBranchList = (branchMap) => {
+const updateBranchList = (branchMap, currentBaseBranchName) => {
 	const container = document.getElementById('base-branch-selector');
 	container.querySelectorAll('select').forEach(elem => elem.remove());
 
@@ -74,11 +74,12 @@ const updateBranchList = (branchMap) => {
 		const option = document.createElement('option');
 		option.value = branchName;
 		option.textContent = branchName;
-		if (env.baseBranchName === branchName) option.selected = true;
+		if (currentBaseBranchName === branchName) option.selected = true;
 		select.append(option);
 	});
 	select.addEventListener('change', event => {
 		const selectedBranchName = event.target.value;
+		baseBranchStorage.save(selectedBranchName);
 		const mermaidText = transformToMermaidText(selectedBranchName, branchMap);
 		showGraph(mermaidText);
 	});
@@ -95,25 +96,30 @@ const showGraph = mermaidText => {
 	container.append(mermaidViewer);
 };
 
+const baseBranchStorage = new Storage('base-branch');
 const branchMapStorage = new Storage('previous-branch-map');
 
-branchMapStorage.load().then(branchMap => {
-	if (branchMap) {
-		updateBranchList(branchMap);
-		const mermaidText = transformToMermaidText(env.baseBranchName, branchMap);
-		showGraph(mermaidText);
-	}
-});
+baseBranchStorage.load().then(baseBranchName => {
+	if (!baseBranchName) baseBranchName = 'master';
 
-document.querySelector('#update').addEventListener('click', () => {
-	fetchMergeRequests()
-	.then(transformToBranchMap)
-	.then(branchMap => {
-		branchMapStorage.save(branchMap);
-		updateBranchList(branchMap);
-		return transformToMermaidText(env.baseBranchName, branchMap);
-	})
-	.then(mermaidText => {
-		showGraph(mermaidText);
+	branchMapStorage.load().then(branchMap => {
+		if (branchMap) {
+			updateBranchList(branchMap, baseBranchName);
+			const mermaidText = transformToMermaidText(baseBranchName, branchMap);
+			showGraph(mermaidText);
+		}
+	});
+
+	document.querySelector('#update').addEventListener('click', () => {
+		fetchMergeRequests()
+		.then(transformToBranchMap)
+		.then(branchMap => {
+			branchMapStorage.save(branchMap);
+			updateBranchList(branchMap, baseBranchName);
+			return transformToMermaidText(baseBranchName, branchMap);
+		})
+		.then(mermaidText => {
+			showGraph(mermaidText);
+		});
 	});
 });
