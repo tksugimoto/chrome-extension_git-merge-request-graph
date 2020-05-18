@@ -63,7 +63,7 @@ const transformToMermaidText = (baseBranchName, branchMap) => {
 	return mermaidTextArray.join('\n');
 };
 
-document.querySelector('#generate').addEventListener('click', () => {
+document.querySelector('#update').addEventListener('click', () => {
 	fetchMergeRequests()
 	.then(transformToBranchMap)
 	.then(branchMap => {
