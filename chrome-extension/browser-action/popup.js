@@ -64,19 +64,6 @@ const transformToMermaidText = (baseBranchName, branchMap) => {
 	return mermaidTextArray.join('\n');
 };
 
-document.querySelector('#update').addEventListener('click', () => {
-	fetchMergeRequests()
-	.then(transformToBranchMap)
-	.then(branchMap => {
-		branchMapStorage.save(branchMap);
-		updateBranchList(branchMap);
-		return transformToMermaidText(env.baseBranchName, branchMap);
-	})
-	.then(mermaidText => {
-		showGraph(mermaidText);
-	});
-});
-
 const updateBranchList = (branchMap) => {
 	const container = document.getElementById('base-branch-selector');
 	container.querySelectorAll('select').forEach(elem => elem.remove());
@@ -116,4 +103,17 @@ branchMapStorage.load().then(branchMap => {
 		const mermaidText = transformToMermaidText(env.baseBranchName, branchMap);
 		showGraph(mermaidText);
 	}
+});
+
+document.querySelector('#update').addEventListener('click', () => {
+	fetchMergeRequests()
+	.then(transformToBranchMap)
+	.then(branchMap => {
+		branchMapStorage.save(branchMap);
+		updateBranchList(branchMap);
+		return transformToMermaidText(env.baseBranchName, branchMap);
+	})
+	.then(mermaidText => {
+		showGraph(mermaidText);
+	});
 });
