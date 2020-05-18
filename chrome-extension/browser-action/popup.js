@@ -68,12 +68,36 @@ document.querySelector('#update').addEventListener('click', () => {
 	.then(transformToBranchMap)
 	.then(branchMap => {
 		saveBranchMap(branchMap);
+		updateBranchList(branchMap);
 		return transformToMermaidText(env.baseBranchName, branchMap);
 	})
 	.then(mermaidText => {
 		showGraph(mermaidText);
 	});
 });
+
+const updateBranchList = (branchMap) => {
+	const container = document.getElementById('base-branch-selector');
+	container.querySelectorAll('select').forEach(elem => elem.remove());
+
+	const select = document.createElement('select');
+
+	Object.keys(branchMap).forEach(branchName => {
+		const option = document.createElement('option');
+		option.value = branchName;
+		option.textContent = branchName;
+		if (env.baseBranchName === branchName) option.selected = true;
+		select.append(option);
+	});
+	select.addEventListener('change', event => {
+		const selectedBranchName = event.target.value;
+		const mermaidText = transformToMermaidText(selectedBranchName, branchMap);
+		showGraph(mermaidText);
+	});
+
+	container.querySelector('label').append(select);
+	container.style.display = '';
+};
 
 const showGraph = mermaidText => {
 	const container = document.querySelector('#result');
@@ -98,6 +122,7 @@ const loadBranchMap = () => {
 
 loadBranchMap().then(branchMap => {
 	if (branchMap) {
+		updateBranchList(branchMap);
 		const mermaidText = transformToMermaidText(env.baseBranchName, branchMap);
 		showGraph(mermaidText);
 	}
