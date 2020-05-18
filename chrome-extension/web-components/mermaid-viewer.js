@@ -16,6 +16,9 @@ export default class MermaidViewer extends HTMLElement {
 
 	connectedCallback() {
 		mermaid.init(this);
+		this.querySelectorAll('a').forEach(a => {
+			a.setAttribute('target', '_blank');
+		});
 	}
 
 }
