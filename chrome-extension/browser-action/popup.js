@@ -66,9 +66,11 @@ const transformToMermaidText = (baseBranchName, branchMap) => {
 document.querySelector('#generate').addEventListener('click', () => {
 	fetchMergeRequests()
 	.then(transformToBranchMap)
-	.then(branchMap => transformToMermaidText(env.baseBranchName, branchMap))
+	.then(branchMap => {
+		saveBranchMap(branchMap);
+		return transformToMermaidText(env.baseBranchName, branchMap);
+	})
 	.then(mermaidText => {
-		saveResult(mermaidText);
 		showGraph(mermaidText);
 	});
 });
@@ -80,13 +82,13 @@ const showGraph = mermaidText => {
 	container.append(mermaidViewer);
 };
 
-const storageKey = 'previous-result';
-const saveResult = mermaidText => {
+const storageKey = 'previous-branch-map';
+const saveBranchMap = mermaidText => {
 	chrome.storage.local.set({
 		[storageKey]: mermaidText,
 	});
 };
-const loadResult = () => {
+const loadBranchMap = () => {
 	return new Promise(resolve => {
 		chrome.storage.local.get(storageKey, items => {
 			resolve(items[storageKey]);
@@ -94,6 +96,9 @@ const loadResult = () => {
 	});
 };
 
-loadResult().then(mermaidText => {
-	if (mermaidText) showGraph(mermaidText);
+loadBranchMap().then(branchMap => {
+	if (branchMap) {
+		const mermaidText = transformToMermaidText(env.baseBranchName, branchMap);
+		showGraph(mermaidText);
+	}
 });
