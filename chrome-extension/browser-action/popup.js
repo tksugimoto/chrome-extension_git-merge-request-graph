@@ -44,7 +44,7 @@ document.querySelector('#generate').addEventListener('click', () => {
 		mermaidTextArray.push('graph RL');
 		mermaidTextArray.push(`${env.baseBranchName}`);
 
-		const disp = targetBranch => {
+		const generateRelationGraphText = targetBranch => {
 			if (!branchMap[targetBranch]) return;
 			branchMap[targetBranch].forEach(mergeRequest => {
 				if (mergeRequest.state !== 'opened') return;
@@ -52,10 +52,10 @@ document.querySelector('#generate').addEventListener('click', () => {
 				mermaidTextArray.push(`${escapeMermaidMeta(sourceBranch)}("!${mergeRequest.iid}: ${mergeRequest.title.replace(/"/g, '#quot;')}<br>${sourceBranch}")`);
 				mermaidTextArray.push(`click ${escapeMermaidMeta(sourceBranch)} "${mergeRequest.web_url}"`);
 				mermaidTextArray.push(`${escapeMermaidMeta(sourceBranch)} --> ${escapeMermaidMeta(targetBranch)}`);
-				disp(sourceBranch);
+				generateRelationGraphText(sourceBranch);
 			});
 		};
-		disp(env.baseBranchName);
+		generateRelationGraphText(env.baseBranchName);
 
 		return mermaidTextArray.join('\n');
 	}).then(mermaidText => {
