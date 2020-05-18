@@ -36,29 +36,37 @@ const transformToBranchMap = mergeRequests => {
 	return branchMap;
 };
 
+/**
+ *
+ * @param {Object.<string, Object[]>} branchMap key: ブランチ名, value: key のブランチに向いている MergeRequest の配列
+ * @returns {string} mermaidText
+ */
+const transformToMermaidText = branchMap => {
+	const mermaidTextArray = [];
+	mermaidTextArray.push('graph RL');
+	mermaidTextArray.push(`${env.baseBranchName}`);
+
+	const generateRelationGraphText = targetBranch => {
+		if (!branchMap[targetBranch]) return;
+		branchMap[targetBranch].forEach(mergeRequest => {
+			if (mergeRequest.state !== 'opened') return;
+			const sourceBranch = mergeRequest.source_branch;
+			mermaidTextArray.push(`${escapeMermaidMeta(sourceBranch)}("!${mergeRequest.iid}: ${mergeRequest.title.replace(/"/g, '#quot;')}<br>${sourceBranch}")`);
+			mermaidTextArray.push(`click ${escapeMermaidMeta(sourceBranch)} "${mergeRequest.web_url}"`);
+			mermaidTextArray.push(`${escapeMermaidMeta(sourceBranch)} --> ${escapeMermaidMeta(targetBranch)}`);
+			generateRelationGraphText(sourceBranch);
+		});
+	};
+	generateRelationGraphText(env.baseBranchName);
+
+	return mermaidTextArray.join('\n');
+};
+
 document.querySelector('#generate').addEventListener('click', () => {
 	fetchMergeRequests()
 	.then(transformToBranchMap)
-	.then(branchMap => {
-		const mermaidTextArray = [];
-		mermaidTextArray.push('graph RL');
-		mermaidTextArray.push(`${env.baseBranchName}`);
-
-		const generateRelationGraphText = targetBranch => {
-			if (!branchMap[targetBranch]) return;
-			branchMap[targetBranch].forEach(mergeRequest => {
-				if (mergeRequest.state !== 'opened') return;
-				const sourceBranch = mergeRequest.source_branch;
-				mermaidTextArray.push(`${escapeMermaidMeta(sourceBranch)}("!${mergeRequest.iid}: ${mergeRequest.title.replace(/"/g, '#quot;')}<br>${sourceBranch}")`);
-				mermaidTextArray.push(`click ${escapeMermaidMeta(sourceBranch)} "${mergeRequest.web_url}"`);
-				mermaidTextArray.push(`${escapeMermaidMeta(sourceBranch)} --> ${escapeMermaidMeta(targetBranch)}`);
-				generateRelationGraphText(sourceBranch);
-			});
-		};
-		generateRelationGraphText(env.baseBranchName);
-
-		return mermaidTextArray.join('\n');
-	}).then(mermaidText => {
+	.then(transformToMermaidText)
+	.then(mermaidText => {
 		saveResult(mermaidText);
 		showGraph(mermaidText);
 	});
