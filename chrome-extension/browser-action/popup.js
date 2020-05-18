@@ -102,6 +102,10 @@ const branchMapStorage = new Storage('previous-branch-map');
 baseBranchStorage.load().then(baseBranchName => {
 	if (!baseBranchName) baseBranchName = 'master';
 
+	baseBranchStorage.addEventListener('update', event => {
+		baseBranchName = event.value;
+	});
+
 	branchMapStorage.load().then(branchMap => {
 		if (branchMap) {
 			updateBranchList(branchMap, baseBranchName);
