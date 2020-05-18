@@ -97,6 +97,7 @@ const updateBranchList = (branchMap) => {
 
 	container.querySelector('label').append(select);
 	container.style.display = '';
+	select.focus();
 };
 
 const showGraph = mermaidText => {
