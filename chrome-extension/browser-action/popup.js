@@ -38,13 +38,14 @@ const transformToBranchMap = mergeRequests => {
 
 /**
  *
+ * @param {string} baseBranchName
  * @param {Object.<string, Object[]>} branchMap key: ブランチ名, value: key のブランチに向いている MergeRequest の配列
  * @returns {string} mermaidText
  */
-const transformToMermaidText = branchMap => {
+const transformToMermaidText = (baseBranchName, branchMap) => {
 	const mermaidTextArray = [];
 	mermaidTextArray.push('graph RL');
-	mermaidTextArray.push(`${env.baseBranchName}`);
+	mermaidTextArray.push(`${baseBranchName}`);
 
 	const generateRelationGraphText = targetBranch => {
 		if (!branchMap[targetBranch]) return;
@@ -57,7 +58,7 @@ const transformToMermaidText = branchMap => {
 			generateRelationGraphText(sourceBranch);
 		});
 	};
-	generateRelationGraphText(env.baseBranchName);
+	generateRelationGraphText(baseBranchName);
 
 	return mermaidTextArray.join('\n');
 };
@@ -65,7 +66,7 @@ const transformToMermaidText = branchMap => {
 document.querySelector('#generate').addEventListener('click', () => {
 	fetchMergeRequests()
 	.then(transformToBranchMap)
-	.then(transformToMermaidText)
+	.then(branchMap => transformToMermaidText(env.baseBranchName, branchMap))
 	.then(mermaidText => {
 		saveResult(mermaidText);
 		showGraph(mermaidText);
