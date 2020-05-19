@@ -6,6 +6,9 @@ const escapeMermaidMeta = text => {
 	return text.replace(/class/g, 'CLASS');
 };
 
+/**
+ * @returns {Promise<Object[]>} Promise.resolve(mergeRequests)
+ */
 const fetchMergeRequests = () => {
 	const url = new URL(`${env.baseUrl}/api/v4/projects/${env.projectId}/merge_requests`);
 	url.searchParams.set('private_token', env.accessToken);
@@ -64,6 +67,11 @@ const transformToMermaidText = (baseBranchName, branchMap) => {
 	return mermaidTextArray.join('\n');
 };
 
+/**
+ *
+ * @param {Object.<string, Object[]>} branchMap key: ブランチ名, value: key のブランチに向いている MergeRequest の配列
+ * @param {string} currentBaseBranchName
+ */
 const updateBranchList = (branchMap, currentBaseBranchName) => {
 	const container = document.getElementById('base-branch-selector');
 	container.querySelectorAll('select').forEach(elem => elem.remove());
@@ -89,6 +97,10 @@ const updateBranchList = (branchMap, currentBaseBranchName) => {
 	select.focus();
 };
 
+/**
+ *
+ * @param {string} mermaidText
+ */
 const showGraph = mermaidText => {
 	const container = document.querySelector('#result');
 	container.textContent = '';
