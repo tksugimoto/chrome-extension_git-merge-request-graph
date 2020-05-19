@@ -78,10 +78,15 @@ const updateBranchList = (branchMap, currentBaseBranchName) => {
 
 	const select = document.createElement('select');
 
-	Object.keys(branchMap).forEach(branchName => {
+	Object.entries(branchMap).map(([branchName, mergeRequests]) => {
+		return {
+			branchName,
+			openedMergeRequestcount: mergeRequests.filter(mergeRequest => mergeRequest.state === 'opened').length,
+		};
+	}).forEach(({ branchName, openedMergeRequestcount }) => {
 		const option = document.createElement('option');
 		option.value = branchName;
-		option.textContent = branchName;
+		option.textContent = `${branchName} (${openedMergeRequestcount})`;
 		if (currentBaseBranchName === branchName) option.selected = true;
 		select.append(option);
 	});
