@@ -83,7 +83,9 @@ const updateBranchList = (branchMap, currentBaseBranchName) => {
 			branchName,
 			openedMergeRequestcount: mergeRequests.filter(mergeRequest => mergeRequest.state === 'opened').length,
 		};
-	}).forEach(({ branchName, openedMergeRequestcount }) => {
+	})
+	.sort((a, b) => b.openedMergeRequestcount - a.openedMergeRequestcount)
+	.forEach(({ branchName, openedMergeRequestcount }) => {
 		const option = document.createElement('option');
 		option.value = branchName;
 		option.textContent = `${branchName} (${openedMergeRequestcount})`;
