@@ -3,7 +3,10 @@ import Storage from '../Storage.js';
 import MermaidViewer from '../web-components/mermaid-viewer.js';
 
 const escapeMermaidMeta = text => {
-	return text.replace(/class/g, 'CLASS');
+	return escape(text)
+	.replace(/%/g, '_percent_')
+	.replace(/end/g, 'END')
+	.replace(/class/g, 'CLASS');
 };
 
 /**
