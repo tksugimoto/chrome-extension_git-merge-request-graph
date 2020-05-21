@@ -7,31 +7,34 @@ const escapeMermaidMeta = text => {
 };
 
 /**
+ * @param {string} state opened, closed, locked, or merged
  * @returns {Promise<Object[]>} Promise.resolve(mergeRequests)
  */
-const fetchMergeRequests = () => {
+const fetchMergeRequests = (state) => {
 	const url = new URL(`${env.baseUrl}/api/v4/projects/${env.projectId}/merge_requests`);
 	url.searchParams.set('private_token', env.accessToken);
 	url.searchParams.set('per_page', 100);
-	url.searchParams.set('state', 'all');
+	url.searchParams.set('state', state);
 	url.searchParams.set('order_by', 'updated_at');
 	return fetch(url.toString()).then(res => res.json());
 };
 
 /**
  *
- * @param {Object[]} mergeRequests
+ * @param {Object.<string, Object[]>} mergeRequests
  * @returns {Object.<string, Object[]>} key: ブランチ名, value: key のブランチに向いている MergeRequest の配列
  */
-const transformToBranchMap = mergeRequests => {
+const transformToBranchMap = ({ openedMergeRequests, mergedMergeRequests}) => {
 	const branchMap = {};
-	mergeRequests.forEach(mergeRequest => {
+	[
+		...openedMergeRequests,
+		...mergedMergeRequests,
+	].forEach(mergeRequest => {
 		const target = mergeRequest.target_branch;
 		if (!branchMap[target]) branchMap[target] = [];
 		branchMap[target].push(mergeRequest);
 	});
-	mergeRequests
-	.filter(mergeRequest => mergeRequest.state === 'merged')
+	mergedMergeRequests
 	.forEach(mergeRequest => {
 		const target = mergeRequest.target_branch;
 		// TODO: merge済みMRが多段になっているときに対応
@@ -135,7 +138,18 @@ baseBranchStorage.load().then(baseBranchName => {
 	});
 
 	document.querySelector('#update').addEventListener('click', () => {
-		fetchMergeRequests()
+		Promise.resolve()
+		.then(() => {
+			// Server 負荷を考えて直列に実行
+			return fetchMergeRequests('opened').then(openedMergeRequests => {
+				return fetchMergeRequests('merged').then(mergedMergeRequests => {
+					return {
+						openedMergeRequests,
+						mergedMergeRequests,
+					};
+				});
+			});
+		})
 		.then(transformToBranchMap)
 		.then(branchMap => {
 			branchMapStorage.save(branchMap);
