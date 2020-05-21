@@ -81,15 +81,15 @@ const updateBranchList = (branchMap, currentBaseBranchName) => {
 	Object.entries(branchMap).map(([branchName, mergeRequests]) => {
 		return {
 			branchName,
-			openedMergeRequestcount: mergeRequests.filter(mergeRequest => mergeRequest.state === 'opened').length,
+			openedMergeRequestCount: mergeRequests.filter(mergeRequest => mergeRequest.state === 'opened').length,
 		};
 	})
-	.filter(_ => _.openedMergeRequestcount !== 0)
-	.sort((a, b) => b.openedMergeRequestcount - a.openedMergeRequestcount)
-	.forEach(({ branchName, openedMergeRequestcount }) => {
+	.filter(_ => _.openedMergeRequestCount !== 0)
+	.sort((a, b) => b.openedMergeRequestCount - a.openedMergeRequestCount)
+	.forEach(({ branchName, openedMergeRequestCount }) => {
 		const option = document.createElement('option');
 		option.value = branchName;
-		option.textContent = `${branchName} (${openedMergeRequestcount})`;
+		option.textContent = `${branchName} (${openedMergeRequestCount})`;
 		if (currentBaseBranchName === branchName) option.selected = true;
 		select.append(option);
 	});
