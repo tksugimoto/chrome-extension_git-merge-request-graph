@@ -22,6 +22,22 @@ const fetchMergeRequests = (state) => {
 	return fetch(url.toString()).then(res => res.json());
 };
 
+/** 使用しない不要なプロパティを削除
+ * @param {Object.<string, any>} mergeRequest
+ * @returns {Object.<string, any>} filteredMergeRequest
+ */
+const deleteUnnecessaryProperties = (mergeRequest) => {
+	const entries = Object.entries(mergeRequest);
+	const filteredEntries =  entries.filter(([key]) => [
+		'iid',
+		'source_branch',
+		'state',
+		'title',
+		'web_url',
+	].includes(key));
+	return Object.fromEntries(filteredEntries);
+};
+
 /**
  *
  * @param {Object.<string, Object[]>} mergeRequests
@@ -35,7 +51,7 @@ const transformToBranchMap = ({ openedMergeRequests, mergedMergeRequests}) => {
 	].forEach(mergeRequest => {
 		const target = mergeRequest.target_branch;
 		if (!branchMap[target]) branchMap[target] = [];
-		branchMap[target].push(mergeRequest);
+		branchMap[target].push(deleteUnnecessaryProperties(mergeRequest));
 	});
 	mergedMergeRequests
 	.forEach(mergeRequest => {
