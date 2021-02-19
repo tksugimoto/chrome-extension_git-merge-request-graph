@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+	<meta charset="utf-8">
+	<title>GitLab Merge Request Graph Viewer</title>
+	<style>
+		body {
+			min-width: 750px;
+		}
+		button#update {
+			width: 100%;
+			padding: 10px;
+			cursor: pointer;
+		}
+	</style>
+	<script src="../lib/mermaid/mermaid.min.js"></script>
+	<script type="module" src="../web-components/mermaid-viewer.js"></script>
+</head>
+<body>
+	<p>
+		<button id="update">Update</button>
+	</p>
+	<p style="display: none;" id="base-branch-selector">
+		<label>
+			ベースブランチ
+			<select></select>
+		</label>
+	</p>
+	<div id="result"></div>
+	<script type="module" src="./popup.js"></script>
+</body>
+</html>

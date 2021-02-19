@@ -1,0 +1,17 @@
+{
+	"name": "GitLab Merge Request Graph",
+	"version": "0.1.0",
+	"manifest_version": 2,
+	"description": "GitLab の Merge Request の関係を可視化",
+	"permissions": [
+		"storage",
+		"contextMenus"
+	],
+	"background": {
+		"persistent": false,
+		"page": "./background/background.html"
+	},
+	"browser_action": {
+		"default_popup": "./browser-action/popup.html"
+	}
+}
